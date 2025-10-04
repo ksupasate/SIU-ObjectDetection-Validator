@@ -311,7 +311,7 @@ The SIU post-processing layer significantly reduces false positives and structur
 
 Example results showing correct vs. incorrect structure detection:
 
-![Example Results](outputs/visualizations/example_results.jpg)
+![Example Results](outputs/visualizations/example_results.png)
 
 *Green boxes indicate validated correct structure; red boxes indicate detected incorrect structure that would be filtered out.*
 
