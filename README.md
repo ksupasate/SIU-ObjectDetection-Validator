@@ -38,7 +38,7 @@ Official implementation of the paper: **"Structured Instance Understanding with 
 ## 📄 Paper Information
 
 **Title:** Structured Instance Understanding with Boundary Box Relationships in Object Detection System
-**Authors:** [Paper Authors]
+**Authors:** Supasate Vorathammathorn
 **Published:** ACM Digital Library, 2024
 **DOI:** [10.1145/3643487.3662729](https://doi.org/10.1145/3643487.3662729)
 
@@ -46,7 +46,7 @@ Official implementation of the paper: **"Structured Instance Understanding with 
 ```bibtex
 @inproceedings{siu2024,
   title={Structured Instance Understanding with Boundary Box Relationships in Object Detection System},
-  author={[Authors]},
+  author={[Vorathammathorn V., et.al.]},
   booktitle={Proceedings of the ACM Conference},
   year={2024},
   doi={10.1145/3643487.3662729}
@@ -455,5 +455,7 @@ If you find this work useful, please consider starring the repository!
 ---
 
 **Implementation Status:** ✅ Complete and ready for use
+
 **Last Updated:** 2024
+
 **Maintained by:** Supasate Vorathammathorn 
