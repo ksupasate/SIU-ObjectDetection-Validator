@@ -54,7 +54,7 @@ models/*.onnx
 !models/.gitkeep
 
 # Outputs
-outputs/
+# outputs/
 logs/
 runs/
 wandb/

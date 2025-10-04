@@ -39,7 +39,7 @@ Official implementation of the paper: **"Structured Instance Understanding with 
 
 **Title:** Structured Instance Understanding with Boundary Box Relationships in Object Detection System
 
-**Authors:** Supasate Vorathammathorn
+**Authors:** Supasate Vorathammathorn, Thanatwit Angsarawanee, Sakol Tasanangam, and Theerat Sakdejayont
 
 **Published:** ACM Digital Library, 2024
 
@@ -410,7 +410,7 @@ If you use this code in your research, please cite our paper:
 ```bibtex
 @inproceedings{siu2024,
   title={Structured Instance Understanding with Boundary Box Relationships in Object Detection System},
-  author={[Authors]},
+  author = {Vorathammathorn, Supasate and Angsarawanee, Thanatwit and Tasanangam, Sakol and Sakdejayont, Theerat},
   booktitle={Proceedings of the ACM Conference},
   year={2024},
   doi={10.1145/3643487.3662729}
