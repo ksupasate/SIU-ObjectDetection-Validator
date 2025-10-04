@@ -49,7 +49,7 @@ Official implementation of the paper: **"Structured Instance Understanding with 
 ```bibtex
 @inproceedings{siu2024,
   title={Structured Instance Understanding with Boundary Box Relationships in Object Detection System},
-  author={[Vorathammathorn V., et.al.]},
+  author={[Vorathammathorn V., et al.]},
   booktitle={Proceedings of the ACM Conference},
   year={2024},
   doi={10.1145/3643487.3662729}
