@@ -105,9 +105,11 @@ docs/_build/
 # Dataset
 Car parts.v1i.yolov11/
 
-# Other Markdown files 
+# Other Markdown files
 *.md
 !README.md
 !IMPLEMENTATION_SUMMARY.md
 !QUICKSTART.md
 
+# Keep GitHub Pages files
+!docs/

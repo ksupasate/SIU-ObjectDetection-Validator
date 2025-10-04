@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Structured Instance Understanding with Boundary Box Relationships - ACM 2024">
+    <title>SIU: Structured Instance Understanding | ACM 2024</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #f5f6fb;
+            --surface: #ffffff;
+            --surface-muted: rgba(255, 255, 255, 0.65);
+            --border: #e2e8f0;
+            --border-strong: #cbd5f5;
+            --text: #0f172a;
+            --text-muted: #475569;
+            --accent: #3656d4;
+            --accent-dark: #1f3aa0;
+            --accent-soft: #e4e9ff;
+            --success: #0f9d58;
+            --shadow: 0 30px 60px -30px rgba(15, 23, 42, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        a { color: inherit; }
+
+        .container {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 1.75rem;
+        }
+
+        /* Header */
+        .site-header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(245, 246, 251, 0.86);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .site-header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.9rem 1.75rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: baseline;
+            gap: 0.3rem;
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        nav a {
+            position: relative;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -0.35rem;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.2s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero */
+        .hero {
+            padding: 5.5rem 0 4.5rem;
+            background: linear-gradient(175deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.6) 40%, rgba(228,233,255,0.45) 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+            gap: 3rem;
+        }
+
+        .publication-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -20px rgba(15, 23, 42, 0.6);
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 1.6rem;
+        }
+
+        .hero-title {
+            font-size: 2.9rem;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 1.3rem;
+        }
+
+        .hero-lead {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 1.6rem;
+        }
+
+        .author-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 1.8rem;
+        }
+
+        .hero-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.85rem;
+            padding: 1rem 1.2rem;
+            box-shadow: 0 15px 30px -28px rgba(15, 23, 42, 0.5);
+        }
+
+        .meta-label {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.35rem;
+            border-radius: 0.7rem;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 18px 35px -20px rgba(54, 86, 212, 0.8);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 20px 40px -18px rgba(54, 86, 212, 0.75);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            background: var(--accent-soft);
+        }
+
+        .hero-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            align-self: start;
+        }
+
+        .hero-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.3rem;
+        }
+
+        .hero-metrics {
+            display: grid;
+            gap: 1.2rem;
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .metric strong {
+            font-size: 1.35rem;
+            color: var(--accent);
+        }
+
+        /* Sections */
+        section.section {
+            padding: 4.5rem 0;
+        }
+
+        .section-header {
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .section-label {
+            display: inline-block;
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+        }
+
+        .section-description {
+            max-width: 680px;
+            margin: 0.5rem auto 0;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Abstract */
+        .abstract-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1.1rem;
+            padding: 2.4rem;
+            box-shadow: 0 25px 60px -45px rgba(15, 23, 42, 0.7);
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        /* Highlights */
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .highlight-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.8rem;
+            text-align: left;
+            box-shadow: 0 20px 40px -40px rgba(15, 23, 42, 0.5);
+        }
+
+        .highlight-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.85rem;
+            background: var(--accent-soft);
+            display: grid;
+            place-items: center;
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .highlight-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .highlight-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Method */
+        .methodology {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .method-step {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1.4rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.8rem 2rem;
+            align-items: start;
+            box-shadow: 0 25px 45px -45px rgba(15, 23, 42, 0.6);
+        }
+
+        .step-index {
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--accent-soft);
+            width: 2.8rem;
+            height: 2.8rem;
+            border-radius: 0.9rem;
+            display: grid;
+            place-items: center;
+            font-size: 1.1rem;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .step-text {
+            color: var(--text-muted);
+            font-size: 0.96rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .step-list {
+            list-style: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .step-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .step-list li::before {
+            content: '\2022';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* Results */
+        .results-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1.15rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .results-panel table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-panel thead {
+            background: var(--accent);
+            color: white;
+        }
+
+        .results-panel th,
+        .results-panel td {
+            padding: 1.1rem 1.4rem;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .results-panel tbody tr:nth-child(even) {
+            background: #f8f9ff;
+        }
+
+        .metric-strong {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .impact-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .impact-card {
+            background: var(--accent);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.8rem;
+            box-shadow: 0 30px 55px -40px rgba(31, 58, 160, 0.85);
+        }
+
+        .impact-value {
+            font-size: 2.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .impact-label {
+            font-size: 0.9rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        /* Code */
+        .code-card {
+            background: #0f172a;
+            color: #f8fafc;
+            border-radius: 1.1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .code-card span { display: block; }
+        .code-comment { color: #94a3b8; }
+        .code-command { color: #34d399; }
+
+        /* Resource Links */
+        .resource-cta {
+            margin-top: 2.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Citation */
+        .citation-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 30px 60px -45px rgba(15, 23, 42, 0.6);
+        }
+
+        .citation-card pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            overflow-x: auto;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 0 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .footer-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            font-weight: 500;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 980px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-card {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .site-header .container {
+                flex-direction: column;
+                gap: 0.9rem;
+                align-items: flex-start;
+            }
+
+            nav {
+                flex-wrap: wrap;
+                gap: 0.8rem;
+            }
+
+            .hero-title {
+                font-size: 2.3rem;
+            }
+
+            section.section {
+                padding: 3.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="#top">SIU</a>
+            <nav>
+                <a href="#overview">Overview</a>
+                <a href="#abstract">Abstract</a>
+                <a href="#highlights">Highlights</a>
+                <a href="#method">Method</a>
+                <a href="#results">Results</a>
+                <a href="#resources">Resources</a>
+                <a href="#citation">Citation</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="top">
+        <section class="hero" id="overview">
+            <div class="container hero-grid">
+                <div>
+                    <div class="publication-tag">
+                        <i class="fas fa-graduation-cap"></i>
+                        ACM Digital Library 2024
+                    </div>
+
+                    <h1 class="hero-title">Structured Instance Understanding with Boundary Box Relationships</h1>
+
+                    <p class="hero-lead">
+                        We introduce a post-processing validator that reasons over geometric relationships of predicted bounding boxes to detect inconsistent object structures, improving reliability across industrial object detection pipelines.
+                    </p>
+
+                    <div class="author-list">
+                        <span>Supasate Vorathammathorn</span>
+                        <span>Thanatwit Angsarawanee</span>
+                        <span>Sakol Tasanangam</span>
+                        <span>Theerat Sakdejayont</span>
+                    </div>
+
+                    <div class="hero-meta">
+                        <div class="meta-card">
+                            <div class="meta-label">Conference</div>
+                            <div class="meta-value">ACM 2024</div>
+                        </div>
+                        <div class="meta-card">
+                            <div class="meta-label">Domain</div>
+                            <div class="meta-value">Post-Detection Validation</div>
+                        </div>
+                        <div class="meta-card">
+                            <div class="meta-label">Keywords</div>
+                            <div class="meta-value">Object Detection, Structural QA</div>
+                        </div>
+                    </div>
+
+                    <div class="hero-actions">
+                        <a href="https://doi.org/10.1145/3643487.3662729" class="btn btn-primary" target="_blank" rel="noopener">
+                            <i class="fas fa-file-pdf"></i>
+                            Read the Paper
+                        </a>
+                        <a href="https://github.com/ksupasate/SIU-ObjectDetection-Validator" class="btn btn-secondary" target="_blank" rel="noopener">
+                            <i class="fab fa-github"></i>
+                            View Code
+                        </a>
+                        <a href="https://universe.roboflow.com/project-p5nyc/car-parts-o7dlr" class="btn btn-secondary" target="_blank" rel="noopener">
+                            <i class="fas fa-database"></i>
+                            Dataset
+                        </a>
+                    </div>
+                </div>
+
+                <aside class="hero-card" aria-label="Paper at a glance">
+                    <h3>At a Glance</h3>
+                    <div class="hero-metrics">
+                        <div class="metric">
+                            <span>Validation Accuracy</span>
+                            <strong>85&ndash;95%</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Error Reduction</span>
+                            <strong>60&ndash;80%</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Reliability Gain</span>
+                            <strong>15&ndash;25%</strong>
+                        </div>
+                        <div class="metric">
+                            <span>Compute Overhead</span>
+                            <strong>&lt; 1s</strong>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="section" id="abstract">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Abstract</span>
+                    <h2>Structured Consistency for Object Detection</h2>
+                    <p class="section-description">
+                        Bounding boxes alone provide limited structural guarantees. SIU elevates detection pipelines by verifying that inferred components respect the spatial grammar of the target system.
+                    </p>
+                </div>
+
+                <article class="abstract-card">
+                    We present Structured Instance Understanding (SIU), a validation layer that inspects the topology of bounding boxes emitted by an object detector. The validator records canonical geometric relationships between parts using domain priors, and rejects detection outputs that violate these relationships. Applied to the Car Parts dataset, SIU identifies malformed assemblies with precision between 85&ndash;92% and recall between 88&ndash;95%, while maintaining minimal runtime overhead. The framework is model-agnostic and can be adapted to other structured detection domains such as PCB inspection or medical imaging workflows.
+                </article>
+            </div>
+        </section>
+
+        <section class="section" id="highlights">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Highlights</span>
+                    <h2>Key Contributions</h2>
+                </div>
+
+                <div class="highlight-grid">
+                    <div class="highlight-card">
+                        <div class="highlight-icon"><i class="fas fa-network-wired"></i></div>
+                        <h3>Relational Validator</h3>
+                        <p>Encodes canonical spatial relationships between parts and flags detections that violate structural constraints.</p>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-icon"><i class="fas fa-clock"></i></div>
+                        <h3>Lightweight Deployment</h3>
+                        <p>Adds &lt;1 second runtime overhead, enabling integration in latency-sensitive production systems.</p>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-icon"><i class="fas fa-chart-line"></i></div>
+                        <h3>Robust Gains</h3>
+                        <p>Delivers up to 25% improvement in structural reliability by reducing misassembled detections 60&ndash;80%.</p>
+                    </div>
+                    <div class="highlight-card">
+                        <div class="highlight-icon"><i class="fas fa-toolbox"></i></div>
+                        <h3>Model Agnostic</h3>
+                        <p>Easily plugs into any object detector, allowing teams to elevate quality control without retraining.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="method">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Method</span>
+                    <h2>Validation Workflow</h2>
+                    <p class="section-description">
+                        SIU integrates after the detector, composing a three-phase pipeline that contextualizes bounding boxes before final approval.
+                    </p>
+                </div>
+
+                <div class="methodology">
+                    <div class="method-step">
+                        <div class="step-index">1</div>
+                        <div>
+                            <h3 class="step-title">Graph Construction</h3>
+                            <p class="step-text">Convert bounding boxes into a relational graph where nodes capture object categories and edges encode adjacency, alignment, and distance statistics.</p>
+                            <ul class="step-list">
+                                <li>Derive canonical anchor points for each object class.</li>
+                                <li>Compute directional relationships and scale-normalized gaps.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="method-step">
+                        <div class="step-index">2</div>
+                        <div>
+                            <h3 class="step-title">Constraint Evaluation</h3>
+                            <p class="step-text">Apply domain-specific rules to the graph to score structural plausibility using statistical thresholds.</p>
+                            <ul class="step-list">
+                                <li>Check mandatory part presence and configuration.</li>
+                                <li>Measure pairwise deviations against learned tolerances.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="method-step">
+                        <div class="step-index">3</div>
+                        <div>
+                            <h3 class="step-title">Decision &amp; Feedback</h3>
+                            <p class="step-text">Flag suspect detections and produce diagnostics to trigger downstream human review or automatic retries.</p>
+                            <ul class="step-list">
+                                <li>Emit structured failure codes for interpretability.</li>
+                                <li>Provide actionable feedback for detector refinement.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="results">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Evaluation</span>
+                    <h2>Experimental Results</h2>
+                    <p class="section-description">
+                        Evaluation on the Car Parts dataset with 3,291 images across 20 categories demonstrates substantial accuracy and reliability gains.
+                    </p>
+                </div>
+
+                <div class="results-panel">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Accuracy</strong></td>
+                                <td class="metric-strong">85&ndash;95%</td>
+                                <td>Overall classification accuracy on structural validity labels.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Precision</strong></td>
+                                <td class="metric-strong">85&ndash;92%</td>
+                                <td>Rate of correct structure predictions among accepted detections.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Recall</strong></td>
+                                <td class="metric-strong">88&ndash;95%</td>
+                                <td>True positive rate of structural anomaly detection.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>F1 Score</strong></td>
+                                <td class="metric-strong">85&ndash;92%</td>
+                                <td>Harmonic mean capturing overall balance.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>ROC AUC</strong></td>
+                                <td class="metric-strong">0.90&ndash;0.95</td>
+                                <td>Area under the ROC curve across operating points.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="impact-strip">
+                    <div class="impact-card">
+                        <div class="impact-value">60&ndash;80%</div>
+                        <div class="impact-label">Error Reduction</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-value">15&ndash;25%</div>
+                        <div class="impact-label">Reliability Gain</div>
+                    </div>
+                    <div class="impact-card">
+                        <div class="impact-value">&lt; 1 sec</div>
+                        <div class="impact-label">Computation</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="resources">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Resources</span>
+                    <h2>Reproduce &amp; Extend</h2>
+                    <p class="section-description">
+                        Get started with the open-source implementation, documentation, and dataset to adapt SIU for your domain.
+                    </p>
+                </div>
+
+                <div class="code-card">
+<span class="code-comment"># Clone the repository</span>
+<span class="code-command">git clone</span> https://github.com/ksupasate/SIU-ObjectDetection-Validator
+<span class="code-command">cd</span> SIU-ObjectDetection-Validator
+
+<span class="code-comment"># Install dependencies</span>
+<span class="code-command">pip install</span> -r requirements.txt
+
+<span class="code-comment"># Train the SIU model</span>
+<span class="code-command">python</span> main.py train
+
+<span class="code-comment"># Run inference</span>
+<span class="code-command">python</span> main.py inference "path/to/image.jpg"
+                </div>
+
+                <div class="resource-cta">
+                    <a href="https://github.com/ksupasate/SIU-ObjectDetection-Validator" class="btn btn-primary" target="_blank" rel="noopener">
+                        <i class="fab fa-github"></i>
+                        Explore on GitHub
+                    </a>
+                    <a href="https://github.com/ksupasate/SIU-ObjectDetection-Validator/blob/main/QUICKSTART.md" class="btn btn-secondary" target="_blank" rel="noopener">
+                        <i class="fas fa-book"></i>
+                        Read Documentation
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="citation">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Reference</span>
+                    <h2>Citation</h2>
+                    <p class="section-description">
+                        If you use this work in your research, please cite the following.
+                    </p>
+                </div>
+
+                <div class="citation-card">
+<pre>@inproceedings{siu2024,
+  title     = {Structured Instance Understanding with Boundary Box
+               Relationships in Object Detection System},
+  author    = {Vorathammathorn, Supasate and Angsarawanee, Thanatwit and
+               Tasanangam, Sakol and Sakdejayont, Theerat},
+  booktitle = {Proceedings of the ACM Conference},
+  year      = {2024},
+  doi       = {10.1145/3643487.3662729}
+}</pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <h3 class="footer-title">Structured Instance Understanding (SIU)</h3>
+            <p>Official implementation accompanying the ACM 2024 publication.</p>
+            <div class="footer-links">
+                <a href="https://doi.org/10.1145/3643487.3662729" target="_blank" rel="noopener"><i class="fas fa-file-alt"></i> Paper</a>
+                <a href="https://github.com/ksupasate/SIU-ObjectDetection-Validator" target="_blank" rel="noopener"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://universe.roboflow.com/project-p5nyc/car-parts-o7dlr" target="_blank" rel="noopener"><i class="fas fa-database"></i> Dataset</a>
+            </div>
+            <p>© 2024 KBTG Lab Research Team &bull; MIT License</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', event => {
+                const target = document.querySelector(anchor.getAttribute('href'));
+                if (target) {
+                    event.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

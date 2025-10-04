@@ -1,0 +1,44 @@
+# Jekyll Configuration for GitHub Pages
+
+# Site settings
+title: "SIU: Structured Instance Understanding"
+description: "Official implementation of Structured Instance Understanding with Boundary Box Relationships in Object Detection System"
+author: "SIU Research Team"
+email: ""
+url: "https://ksupasate.github.io"
+baseurl: "/SIU-ObjectDetection-Validator"
+
+# Build settings
+theme: jekyll-theme-cayman
+markdown: kramdown
+highlighter: rouge
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Exclude files
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+
+# SEO settings
+twitter:
+  username: ""
+  card: summary_large_image
+
+# Google Analytics (optional)
+google_analytics: ""
+
+# Social links
+social:
+  name: SIU Research Team
+  links:
+    - https://github.com/ksupasate/SIU-ObjectDetection-Validator
+
+# Logo and favicon
+logo: /assets/logo.png
+favicon: /assets/favicon.ico
