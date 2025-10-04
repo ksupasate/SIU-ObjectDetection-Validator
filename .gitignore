@@ -108,3 +108,6 @@ Car parts.v1i.yolov11/
 # Other Markdown files 
 *.md
 !README.md
+!IMPLEMENTATION_SUMMARY.md
+!QUICKSTART.md
+
