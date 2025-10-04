@@ -1,0 +1,110 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# Model files (large)
+models/*.pt
+models/*.pth
+models/*.onnx
+*.weights
+
+# Keep the models directory structure
+!models/.gitkeep
+
+# Outputs
+outputs/
+logs/
+runs/
+wandb/
+models/
+
+# Data (if large dataset)
+# Uncomment if you don't want to track dataset
+# Car parts.v1i.yolov11/
+
+# Temporary files
+*.log
+*.tmp
+*.cache
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Environment variables
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# Documentation
+docs/_build/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Compiled files
+*.pyc
+*.pyo
+
+# Dataset
+Car parts.v1i.yolov11/
+
+# Other Markdown files 
+*.md
+!README.md

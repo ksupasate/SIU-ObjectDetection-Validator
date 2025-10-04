@@ -1,0 +1,144 @@
+# SIU Object Detection Validator Configuration
+
+# Dataset Configuration
+dataset:
+  root_dir: "Car parts.v1i.yolov11"
+  train_images: "Car parts.v1i.yolov11/train/images"
+  train_labels: "Car parts.v1i.yolov11/train/labels"
+  valid_images: "Car parts.v1i.yolov11/valid/images"
+  valid_labels: "Car parts.v1i.yolov11/valid/labels"
+  test_images: "Car parts.v1i.yolov11/test/images"
+  test_labels: "Car parts.v1i.yolov11/test/labels"
+  data_yaml: "Car parts.v1i.yolov11/data.yaml"
+  image_size: 640
+
+# Class names (20 car parts)
+classes:
+  - 'Car boot'
+  - 'Car hood'
+  - 'Driver-s door - -F-R-'
+  - 'Fender - -F-L-'
+  - 'Fender - -F-R-'
+  - 'Fender - -R-L-'
+  - 'Fender - -R-R-'
+  - 'Front bumper'
+  - 'Headlight - -L-'
+  - 'Headlight - -R-'
+  - 'Passenger-s door - -F-L-'
+  - 'Passenger-s door - -R-L-'
+  - 'Passenger-s door - -R-R-'
+  - 'Rear bumper'
+  - 'Rear light - -L-'
+  - 'Rear light - -R-'
+  - 'Side bumper - -L-'
+  - 'Side bumper - -R-'
+  - 'Side mirror - -L-'
+  - 'Side mirror - -R-'
+
+# YOLO Model Configuration
+yolo:
+  model_name: "yolov8n.pt"  # Nano model for faster training, can use yolov8s/m/l/x
+  confidence_threshold: 0.25
+  iou_threshold: 0.45
+  max_det: 30  # Maximum detections per image
+  device: ""  # Empty string auto-detects cuda/mps/cpu
+
+# Data Synthesis Configuration (for generating incorrect structures)
+synthesis:
+  # Class Transform: swap class labels between objects
+  class_transform:
+    probability: 0.3  # Probability of applying to each object
+
+  # Random Add: add spurious/duplicate bounding boxes
+  random_add:
+    min_boxes: 1
+    max_boxes: 3
+    overlap_threshold: 0.3  # Minimum IoU to avoid
+
+  # Random Delete: remove bounding boxes
+  random_delete:
+    min_delete: 1
+    max_delete: 3
+
+  # Box Shift: shift bounding boxes to incorrect positions
+  box_shift:
+    shift_range: [0.2, 0.5]  # Shift by 20-50% of image size
+    probability: 0.3
+
+  # Number of synthetic incorrect samples per correct sample
+  synthesis_ratio: 1.0
+
+# Feature Engineering Configuration
+features:
+  # Pairwise geometric features between bounding boxes
+  # - Distance between centers (normalized by image diagonal)
+  # - Angle between centers (in degrees)
+  # - Box size ratio (area ratio)
+  # - Relative positions (dx, dy normalized)
+  use_distance: true
+  use_angle: true
+  use_size_ratio: true
+  use_relative_position: true
+  use_iou: true
+  use_box_dimensions: true
+
+# SIU Model Configuration
+siu_model:
+  # Tree-based classifier (as recommended in paper)
+  classifier_type: "GradientBoosting"  # Options: GradientBoosting, RandomForest
+
+  # GradientBoosting parameters
+  gradient_boosting:
+    n_estimators: 200
+    learning_rate: 0.1
+    max_depth: 5
+    min_samples_split: 10
+    min_samples_leaf: 5
+    subsample: 0.8
+    random_state: 42
+
+  # RandomForest parameters (alternative)
+  random_forest:
+    n_estimators: 200
+    max_depth: 15
+    min_samples_split: 10
+    min_samples_leaf: 5
+    random_state: 42
+
+  # Instance score threshold (N_true / (N_true + N_false))
+  # Will be optimized during training, this is initial value
+  instance_score_threshold: 0.85
+
+  # Use cross-validation for threshold optimization
+  cv_folds: 5
+
+# Training Configuration
+training:
+  test_size: 0.2  # Train/val split
+  random_state: 42
+  use_validation_set: true  # Use separate validation set from dataset
+  balance_classes: true  # Balance correct/incorrect samples
+  max_samples_per_class: null  # null = use all samples
+
+# Output Configuration
+output:
+  models_dir: "models"
+  results_dir: "outputs"
+  visualizations_dir: "outputs/visualizations"
+  logs_dir: "logs"
+  save_visualizations: true
+  save_predictions: true
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/siu.log"
+
+# Inference Configuration
+inference:
+  batch_size: 1
+  save_images: true
+  show_confidence: true
+  thickness: 2
+  font_scale: 0.5
