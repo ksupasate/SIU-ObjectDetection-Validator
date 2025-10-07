@@ -449,7 +449,7 @@ We welcome contributions! Please feel free to:
 For questions about the paper or implementation:
 - **Paper-related questions:** Please refer to the [paper](https://doi.org/10.1145/3643487.3662729)
 - **Implementation issues:** Open a GitHub issue
-- **General inquiries:** [Contact information]
+- **General inquiries:** ksupasate@gmail.com
 
 ## 🌟 Star History
 
@@ -457,7 +457,7 @@ If you find this work useful, please consider starring the repository!
 
 ---
 
-**Implementation Status:** ✅ Complete and ready for use
+**Implementation Status:** Complete and ready for use ✅
 
 **Last Updated:** 2025
 
