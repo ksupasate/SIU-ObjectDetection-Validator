@@ -34,8 +34,10 @@ def setup_logging(config: Dict[str, Any]) -> logging.Logger:
     log_format = log_config.get('format', '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     log_file = log_config.get('file', 'logs/siu.log')
 
-    # Create logs directory if it doesn't exist
-    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+    # Create logs directory if it doesn't exist (only when a directory is specified)
+    log_dir = os.path.dirname(log_file)
+    if log_dir:
+        os.makedirs(log_dir, exist_ok=True)
 
     # Configure logging
     logging.basicConfig(

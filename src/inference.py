@@ -28,7 +28,7 @@ except ImportError:
 from .utils import (
     load_config, setup_logging, visualize_boxes, get_timestamp
 )
-from .feature_engineering import extract_geometric_features
+from .feature_engineering import extract_geometric_features, pad_or_truncate_features
 
 logger = logging.getLogger('SIU.Inference')
 
@@ -46,7 +46,7 @@ class SIUValidator:
         yolo_model_path: str,
         siu_model_path: str,
         scaler_path: str,
-        threshold_path: str,
+        threshold: float,
         config: Dict[str, Any]
     ):
         """
@@ -56,7 +56,7 @@ class SIUValidator:
             yolo_model_path: Path to YOLO model weights
             siu_model_path: Path to trained SIU classifier
             scaler_path: Path to fitted feature scaler
-            threshold_path: Path to instance score threshold
+            threshold: Instance score decision threshold
             config: Configuration dictionary
         """
         self.config = config
@@ -75,11 +75,11 @@ class SIUValidator:
         # Load scaler
         logger.info(f"Loading feature scaler from {scaler_path}")
         self.scaler = joblib.load(scaler_path)
+        self.threshold = threshold
+        self.expected_feature_length = getattr(self.scaler, 'n_features_in_', None)
 
-        # Load threshold
-        logger.info(f"Loading threshold from {threshold_path}")
-        with open(threshold_path, 'r') as f:
-            self.threshold = float(f.read().strip())
+        if self.expected_feature_length is None:
+            logger.warning("Scaler is missing n_features_in_; feature padding may be inaccurate.")
 
         logger.info(f"SIU Validator initialized (threshold={self.threshold:.2f})")
 
@@ -194,8 +194,10 @@ class SIUValidator:
             }
 
         # Pad/truncate to match training feature length
-        # This is a simplified approach; in production, you'd save the expected length
-        features_padded = features
+        if self.expected_feature_length is None:
+            features_padded = features
+        else:
+            features_padded = pad_or_truncate_features(features, self.expected_feature_length)
 
         # Scale features
         features_scaled = self.scaler.transform(features_padded.reshape(1, -1))
@@ -226,9 +228,9 @@ class SIUValidator:
 
 def run_inference_pipeline(
     image_path: str,
-    yolo_model: YOLO,
-    siu_model: Any,
-    scaler: Any,
+    yolo_model_path: str,
+    siu_model_path: str,
+    scaler_path: str,
     instance_score_threshold: float,
     config: Dict[str, Any],
     save_visualization: bool = True,
@@ -239,9 +241,9 @@ def run_inference_pipeline(
 
     Args:
         image_path: Path to input image
-        yolo_model: Loaded YOLO model
-        siu_model: Loaded SIU classifier
-        scaler: Loaded feature scaler
+        yolo_model_path: Path to YOLO model weights
+        siu_model_path: Path to SIU classifier pickle file
+        scaler_path: Path to fitted StandardScaler pickle file
         instance_score_threshold: Threshold for structure validation
         config: Configuration dictionary
         save_visualization: Whether to save visualization
@@ -259,10 +261,10 @@ def run_inference_pipeline(
 
     # Create validator
     validator = SIUValidator(
-        yolo_model_path=yolo_model,
-        siu_model_path=siu_model,
-        scaler_path=scaler,
-        threshold_path=instance_score_threshold,
+        yolo_model_path=yolo_model_path,
+        siu_model_path=siu_model_path,
+        scaler_path=scaler_path,
+        threshold=instance_score_threshold,
         config=config
     )
 
@@ -312,7 +314,10 @@ def run_inference_pipeline(
             2
         )
 
-        score_text = f"Score: {validation_result['instance_score']:.3f} (Threshold: {instance_score_threshold:.2f})"
+        score_text = (
+            f"Score: {validation_result['instance_score']:.3f} "
+            f"(Threshold: {validator.threshold:.2f})"
+        )
         cv2.putText(
             img_vis,
             score_text,
