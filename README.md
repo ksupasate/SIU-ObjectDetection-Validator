@@ -28,6 +28,7 @@ Implementation of the SIU (Structured Instance Understanding) approach for valid
 - [Evaluation](#evaluation)
 - [Troubleshooting](#troubleshooting)
 - [Resources](#resources)
+- [Citation](#citation)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -73,9 +74,8 @@ siu-object-detection-validator/
 │   ├── train.py
 │   └── utils.py
 ├── main.py                  # CLI entry point
-├── QUICKSTART.md            # Hands-on setup guide
-├── IMPLEMENTATION_SUMMARY.md
 ├── CONTRIBUTE.md
+├── LICENSE
 └── ...
 ```
 
@@ -199,11 +199,23 @@ The SIU validator typically reduces structural errors by 60 – 80% with <1�
 
 ## Resources
 
-- [Quick Start](QUICKSTART.md)
-- [Implementation Summary](IMPLEMENTATION_SUMMARY.md)
 - ACM Digital Library entry for the paper: [10.1145/3643487.3662729](https://doi.org/10.1145/3643487.3662729)
 - Dataset on Roboflow: [Car Parts](https://universe.roboflow.com/project-p5nyc/car-parts-o7dlr)
 - YOLOv8 by Ultralytics: <https://github.com/ultralytics/ultralytics>
+
+## Citation
+
+If this project supports your research, please cite:
+
+```bibtex
+@inproceedings{siu2024,
+  title     = {Structured Instance Understanding with Boundary Box Relationships in Object Detection System},
+  author    = {Vorathammathorn, Supasate and Angsarawanee, Thanatwit and Tasanangam, Sakol and Sakdejayont, Theerat},
+  booktitle = {Proceedings of the ACM Conference},
+  year      = {2024},
+  doi       = {10.1145/3643487.3662729}
+}
+```
 
 ## Contributing
 
